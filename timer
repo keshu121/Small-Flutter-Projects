@@ -1,0 +1,238 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
+void main(){
+  runApp(myapp());
+
+}
+class myapp extends StatefulWidget {
+  @override
+  _myappState createState() => _myappState();
+}
+
+class _myappState extends State<myapp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+
+      title: 'Watch',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+      home: myhomepage(),
+    );
+  }
+}
+class myhomepage extends StatefulWidget {
+  @override
+  _myhomepageState createState() => _myhomepageState();
+}
+
+class _myhomepageState extends State<myhomepage> with TickerProviderStateMixin
+{
+  TabController tb;
+  int hour = 0;
+  int min = 0;
+  int sec = 0;
+  String timetodisplay = "";
+  bool started = true;
+  bool stopped = false;
+  int timefortimer;
+  final dur = const Duration(seconds: 1);
+
+
+  @override
+  void initState() {
+    tb = TabController(
+      length: 2,
+      vsync: this,
+    );
+    super.initState();
+  }
+
+  void start(){
+  timefortimer = ((hour * 3600) + (min * 60) + sec);
+  Timer.periodic(dur, (Timer t){
+    setState(() {
+      if(timefortimer <1 ){
+        t.cancel();
+      }
+      else{
+        timefortimer = timefortimer - 1;
+        timetodisplay = timefortimer.toString();
+      }
+    });
+  });
+
+  }
+  void stop(){
+
+  }
+  Widget timer() {
+    return Container(
+      alignment: Alignment.center,
+      padding: EdgeInsets.all(40.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            flex: 6,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding (
+                    padding: EdgeInsets.only(
+                      bottom: 10.0,
+                    ),
+                      child: Text(
+                        "HH",
+                      ),
+                    ),
+                    NumberPicker.integer
+                      (initialValue: hour, minValue: 0, maxValue: 23, onChanged: (val){
+                        setState(() {
+                          hour = val;
+                        }
+                        );
+                    }
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding (
+                      padding: EdgeInsets.only(
+                        bottom: 10.0,
+                      ),
+                      child: Text(
+                        "MM",
+                      ),
+                    ),
+                    NumberPicker.integer
+                      (initialValue: min, minValue: 0, maxValue: 59, onChanged: (val){
+                      setState(() {
+                        min = val;
+                      });
+                    }
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding (
+                      padding: EdgeInsets.only(
+                        bottom: 10.0,
+                      ),
+                      child: Text(
+                        "SS",
+                      ),
+                    ),
+                    NumberPicker.integer
+                      (initialValue: sec, minValue: 0, maxValue: 59,
+                        onChanged: (val){
+                      setState(() {
+                        sec = val;
+                      });
+                    }
+                    ),
+                  ],
+                ),
+              ],
+
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '$timetodisplay',
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              '',
+            ),
+          ),
+          Expanded(
+            flex: 6,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: started ? start : null,
+                  color: Colors.greenAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 35.0,
+                      vertical: 12.0),
+                  child: Text(
+                    "Start",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                RaisedButton(
+                  onPressed: stopped ? null : stop,
+                  color: Colors.greenAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 35.0,
+                      vertical: 12.0),
+                  child: Text(
+                    "Stop",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Watch',
+          ),
+        centerTitle: true,
+        bottom: TabBar(
+          tabs: <Widget>[
+            Text(
+              "Timer",
+            ),
+            Text(
+              "Stopwatch"
+            ),
+          ],
+          labelStyle: TextStyle(
+            fontSize: 18.0,
+          ),
+          labelPadding: EdgeInsets.only(bottom: 10),
+          unselectedLabelColor: Colors.white60,
+          controller: tb,
+        ),
+        ),
+      body: TabBarView(
+        children: <Widget>[
+          timer(),
+          Text(
+              "Stopwatch"
+          ),
+        ],
+        controller: tb,
+      ),
+      );
+  }
+}
